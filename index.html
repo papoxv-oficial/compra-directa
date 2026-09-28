@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra Directa Colombia</title>
+    <!-- Estilos modernos optimizados para celular -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        .cart-modal { display: none; }
+        .cart-modal.active { display: flex; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans pb-20">
+
+    <!-- Encabezado / Título de tu marca -->
+    <header class="bg-white sticky top-0 shadow-xs z-50 px-4 py-3 flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wide text-neutral-900">COMPRA DIRECTA</h1>
+        <button onclick="toggleCart()" class="relative bg-neutral-900 text-white p-2 rounded-full">
+            🛒 <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-xs px-1.5 rounded-full">0</span>
+        </button>
+    </header>
+
+    <!-- Banner Informativo -->
+    <div class="p-3 text-center bg-amber-50 border-b border-amber-100 text-xs uppercase tracking-widest text-amber-800 font-medium">
+        ✨ Accesorios Hermosos • Envíos a todo el país ✨
+    </div>
+
+    <!-- Catálogo de Productos (Diseño en 2 columnas ideal para móvil) -->
+    <main class="p-4 grid grid-cols-2 gap-4 max-w-md mx-auto">
+        
+        <!-- Producto 1: Aretes -->
+        <div class="bg-white rounded-2xl shadow-xs overflow-hidden border border-gray-100 flex flex-col justify-between">
+            <div class="h-40 bg-neutral-100 flex items-center justify-center text-gray-400">📷 Foto Aretes</div>
+            <div class="p-3 text-center">
+                <h3 class="font-medium text-sm">Aretes Elegantes</h3>
+                <p class="text-neutral-900 font-bold text-xs my-1">\$25.000 COP</p>
+                <button onclick="addToCart('Aretes Elegantes', 25000)" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs py-2 rounded-xl mt-1 font-semibold transition-colors">Agregar</button>
+            </div>
+        </div>
+
+        <!-- Producto 2: Cadena -->
+        <div class="bg-white rounded-2xl shadow-xs overflow-hidden border border-gray-100 flex flex-col justify-between">
+            <div class="h-40 bg-neutral-100 flex items-center justify-center text-gray-400">📷 Foto Cadena</div>
+            <div class="p-3 text-center">
+                <h3 class="font-medium text-sm">Cadena Sutil</h3>
+                <p class="text-neutral-900 font-bold text-xs my-1">\$35.000 COP</p>
+                <button onclick="addToCart('Cadena Sutil', 35000)" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white text-xs py-2 rounded-xl mt-1 font-semibold transition-colors">Agregar</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Ventana del Carrito de Compras (Desplegable) -->
+    <div id="cart-modal" class="cart-modal fixed inset-0 bg-black/50 z-50 justify-end items-end">
+        <div class="bg-white w-full rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h2 class="text-lg font-bold text-neutral-900">Tu Pedido 🛍️</h2>
+                    <button onclick="toggleCart()" class="text-gray-400 text-xl font-bold p-1">✕</button>
+                </div>
+                <div id="cart-items" class="space-y-3">
+                    <!-- Los productos agregados aparecerán aquí automáticamente -->
+                </div>
+            </div>
+            
+            <div class="border-t pt-4 mt-6">
+                <div class="flex justify-between font-bold text-lg mb-4 text-neutral-900">
+                    <span>Total:</span>
+                    <span id="cart-total">\$0 COP</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-3.5 rounded-2xl font-bold flex justify-center items-center gap-2 transition-colors shadow-md text-sm">
+                    💬 Confirmar Pedido por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lógica funcional de la tienda -->
+    <script>
+        let cart = [];
+        // NOTA: Reemplaza este número por tu número de WhatsApp real de atención
+        const WHATSAPP_NUMBER = "573000000000"; 
+
+        function toggleCart() {
+            document.getElementById('cart-modal').classList.toggle('active');
+        }
+
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCart();
+            // Abre automáticamente el carrito para que el cliente vea que se agregó
+            document.getElementById('cart-modal').classList.add('active');
+        }
+
+        function updateCart() {
+            document.getElementById('cart-count').innerText = cart.length;
+            const itemsContainer = document.getElementById('cart-items');
+            itemsContainer.innerHTML = '';
+            
+            let total = 0;
+            if(cart.length === 0) {
+                itemsContainer.innerHTML = '<p class="text-gray-400 text-center py-8 text-sm">El carrito está vacío</p>';
+            }
+            
+            cart.forEach((item, index) => {
+                total += item.price;
+                itemsContainer.innerHTML += `
+                    <div class="flex justify-between items-center text-sm bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
+                        <span class="font-medium text-neutral-800">${item.name}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-neutral-900">$${item.price.toLocaleString('es-CO')}</span>
+                            <button onclick="removeItem(${index})" class="text-red-500 font-medium text-xs hover:underline">Quitar</button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('cart-total').innerText = `$${total.toLocaleString('es-CO')} COP`;
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function checkout() {
+            if(cart.length === 0) return alert("Tu carrito está vacío");
+            
+            let message = "¡Hola! Quiero hacer un pedido en Compra Directa Colombia:\n\n";
+            let total = 0;
+            cart.forEach(item => {
+                message += `• ${item.name} ($${item.price.toLocaleString('es-CO')} COP)\n`;
+                total += item.price;
+            });
+            message += `\n*Total del Pedido:* $${total.toLocaleString('es-CO')} COP\n\n`;
+            message += "Solicito la información para hacer la transferencia inmediata por PSE, Nequi, Bancolombia o Daviplata. ✨";
+            
+            const url = `https://wa.me{WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>
